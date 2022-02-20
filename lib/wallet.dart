@@ -28,7 +28,8 @@ extension Conveniences on DateRange {
 
 class Wallet with ChangeNotifier {
   Future<List<Transaction>> transactions = Future.value([]);
-  Future<List<MonthlyBalance>> monthlyExpenses = Future.value([]);
+  Future<ThisAndLastMonthExpenses> monthlyExpenses =
+      Future.value(ThisAndLastMonthExpenses(lastMonth: [], thisMonth: []));
   DateRange _dateRange = DateRange.ThisMonth;
 
   set dateRange(DateRange value) {

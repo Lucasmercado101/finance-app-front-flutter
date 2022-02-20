@@ -1,26 +1,21 @@
 import 'dart:convert';
 
 import 'package:finance_app_front_flutter/api/getExpensesBetween.dart';
+import 'package:finance_app_front_flutter/api/getExpensesTotalBetween.dart';
 import 'package:finance_app_front_flutter/api/getIncomesBetween.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart';
 
 enum Period { today, week, month, year }
 
-class MonthlyBalance {
-  final double expenses;
-  final String currency;
-  final double lastMonthExpensesDiff;
+class ThisAndLastMonthExpenses {
+  final List<GetExpensesTotalBetweenResp> thisMonth;
+  final List<GetExpensesTotalBetweenResp> lastMonth;
 
-  MonthlyBalance(
-      {required this.expenses,
-      required this.currency,
-      required this.lastMonthExpensesDiff});
-
-  MonthlyBalance.fromJson(Map<String, dynamic> json)
-      : expenses = json['expenses'] + .0,
-        currency = json['currency'],
-        lastMonthExpensesDiff = json['last_month_expenses_diff'] + .0;
+  ThisAndLastMonthExpenses({
+    required this.thisMonth,
+    required this.lastMonth,
+  });
 }
 
 enum TransactionType {
@@ -185,13 +180,18 @@ class WalletApi {
   //   );
   // }
 
-  // static Future<List<MonthlyBalance>> getTotalMonthlyExpenses() async {
-  //   final response = await get(totalMonthlyExpensesEndpoint);
-  //   final parsed = json.decode(response.body);
-  //   final parsedList = List<Map<String, dynamic>>.from(parsed);
+  static Future<ThisAndLastMonthExpenses> getTotalMonthlyExpenses() async {
+    final now = DateTime.now();
+    final thisMonth = DateTime(now.year, now.month, 1);
+    final lastMonth = DateTime(now.year, now.month - 1, 1);
+    final expensesThisMonth = await getExpensesTotalBetween(
+        from: thisMonth, to: thisMonth.add(const Duration(days: 31)));
+    final expensesLastMonth =
+        await getExpensesTotalBetween(from: lastMonth, to: thisMonth);
 
-  //   return parsedList.map((el) => MonthlyBalance.fromJson(el)).toList();
-  // }
+    return ThisAndLastMonthExpenses(
+        lastMonth: expensesLastMonth, thisMonth: expensesThisMonth);
+  }
 
   // static Future<List<Expense>> getExpenses({
   //   Period? range,

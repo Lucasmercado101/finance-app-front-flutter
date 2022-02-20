@@ -211,7 +211,6 @@ class WalletApi {
   // }
 
   static Future<List<Transaction>> getTransactions({
-    Period? range,
     required DateTime startDate,
     required DateTime endDate,
   }) async {

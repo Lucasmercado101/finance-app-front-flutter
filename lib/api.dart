@@ -4,6 +4,7 @@ import 'package:finance_app_front_flutter/api/getExpensesBetween.dart';
 import 'package:finance_app_front_flutter/api/getExpensesTotalBetween.dart';
 import 'package:finance_app_front_flutter/api/getIncomesBetween.dart';
 import 'package:finance_app_front_flutter/api/responseExpenseDto.dart';
+import 'package:finance_app_front_flutter/api/responseIncomeDto.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart';
 
@@ -135,28 +136,6 @@ class WalletApi {
 
   // // --------  API Calls  --------
 
-  // static Future<Response> newIncome({
-  //   required currency,
-  //   required amount,
-  //   required category,
-  //   createdAt,
-  //   comment,
-  // }) async {
-  //   return post(
-  //     newIncomeEndpoint,
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: jsonEncode({
-  //       'currency': currency,
-  //       'createdAt': (createdAt ?? DateTime.now()).toIso8601String(),
-  //       'amount': amount,
-  //       'category': category,
-  //       'comment': comment,
-  //     }),
-  //   );
-  // }
-
   static Future<ResponseExpenseDto> newExpense({
     required currency,
     required amount,
@@ -179,6 +158,31 @@ class WalletApi {
     ).then((value) {
       final parsed = jsonDecode(value.body);
       return ResponseExpenseDto.fromJson(parsed);
+    });
+  }
+
+  static Future<ResponseIncomeDto> newIncome({
+    required currency,
+    required amount,
+    required createdAt,
+    category,
+    comment,
+  }) async {
+    return post(
+      newExpenseEndpoint,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'currency': currency,
+        'created_at': (createdAt ?? DateTime.now()).toIso8601String(),
+        'amount': amount,
+        'category': category,
+        'comment': comment,
+      }),
+    ).then((value) {
+      final parsed = jsonDecode(value.body);
+      return ResponseIncomeDto.fromJson(parsed);
     });
   }
 

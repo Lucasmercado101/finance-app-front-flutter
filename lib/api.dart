@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:finance_app_front_flutter/api/getExpensesBetween.dart';
 import 'package:finance_app_front_flutter/api/getExpensesTotalBetween.dart';
 import 'package:finance_app_front_flutter/api/getIncomesBetween.dart';
+import 'package:finance_app_front_flutter/api/responseExpenseDto.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart';
 
@@ -89,8 +90,6 @@ class WalletApi {
 
   static final Uri newIncomeEndpoint = Uri.parse("$baseUrl/new-income");
   static final Uri newExpenseEndpoint = Uri.parse("$baseUrl/new-expense");
-  static final Uri totalMonthlyExpensesEndpoint =
-      Uri.parse("$baseUrl/total-monthly-expenses");
 
   // static Uri expensesBetweenEndpoint({
   //   DateTime? startDate,
@@ -158,27 +157,30 @@ class WalletApi {
   //   );
   // }
 
-  // static Future<Response> newExpense({
-  //   required currency,
-  //   required amount,
-  //   required category,
-  //   createdAt,
-  //   comment,
-  // }) async {
-  //   return post(
-  //     newExpenseEndpoint,
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: jsonEncode({
-  //       'currency': currency,
-  //       'createdAt': (createdAt ?? DateTime.now()).toIso8601String(),
-  //       'amount': amount,
-  //       'category': category,
-  //       'comment': comment,
-  //     }),
-  //   );
-  // }
+  static Future<ResponseExpenseDto> newExpense({
+    required currency,
+    required amount,
+    required createdAt,
+    category,
+    comment,
+  }) async {
+    return post(
+      newExpenseEndpoint,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'currency': currency,
+        'created_at': (createdAt ?? DateTime.now()).toIso8601String(),
+        'amount': amount,
+        'category': category,
+        'comment': comment,
+      }),
+    ).then((value) {
+      final parsed = jsonDecode(value.body);
+      return ResponseExpenseDto.fromJson(parsed);
+    });
+  }
 
   static Future<ThisAndLastMonthExpenses> getTotalMonthlyExpenses() async {
     final now = DateTime.now();

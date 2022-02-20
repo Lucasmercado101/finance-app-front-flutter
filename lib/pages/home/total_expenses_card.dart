@@ -2,8 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:finance_app_front_flutter/api.dart';
 import 'package:finance_app_front_flutter/utils.dart';
 
+class Balance {
+  final double balance;
+  final String currency;
+  final double lastMonthDiff;
+
+  Balance({
+    required this.balance,
+    required this.currency,
+    required this.lastMonthDiff,
+  });
+}
+
 class TotalExpensesCard extends StatelessWidget {
-  final MonthlyBalance balance;
+  final Balance balance;
 
   const TotalExpensesCard(
     this.balance, {
@@ -36,7 +48,7 @@ class TotalExpensesCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      (prettifyCurrency(balance.expenses) +
+                      (prettifyCurrency(balance.balance) +
                           " - " +
                           balance.currency),
                       style: TextStyle(
@@ -56,14 +68,14 @@ class TotalExpensesCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(4.0),
                     decoration: BoxDecoration(
-                      color: balance.lastMonthExpensesDiff > 0
+                      color: balance.lastMonthDiff > 0
                           ? Theme.of(context).errorColor.withGreen(100)
                           : Colors.lightGreen[600],
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      (balance.lastMonthExpensesDiff > 0 ? "+" : "-") +
-                          prettifyCurrency(balance.lastMonthExpensesDiff),
+                      (balance.lastMonthDiff > 0 ? "+" : "-") +
+                          prettifyCurrency(balance.lastMonthDiff),
                       style: const TextStyle(color: Colors.white),
                     ),
                   ),

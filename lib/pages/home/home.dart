@@ -58,25 +58,46 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: CustomScrollView(
         slivers: [
-          FutureBuilder<List<MonthlyBalance>>(
+          FutureBuilder<ThisAndLastMonthExpenses>(
             future: wallet.monthlyExpenses,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                final List<MonthlyBalance> resp = snapshot.data!;
+                final ThisAndLastMonthExpenses expenses = snapshot.data!;
 
-                if (resp.isEmpty) {
+                if (expenses.lastMonth.isEmpty && expenses.thisMonth.isEmpty) {
                   return const SliverToBoxAdapter(
                     child: SizedBox(height: 16),
                   );
                 }
+
+                List<Balance> balances = [];
+
+                for (var i; i < expenses.thisMonth.length; i++) {
+                  double lastMonthExpenses = 0;
+                  int? lastMonthExpensesIndex = expenses.lastMonth.indexWhere(
+                      (e) => e.currency == expenses.thisMonth[i].currency);
+
+                  if (lastMonthExpensesIndex > -1) {
+                    lastMonthExpenses =
+                        expenses.lastMonth[lastMonthExpensesIndex].amount;
+                  }
+
+                  balances.add(Balance(
+                    balance: expenses.thisMonth[i].amount,
+                    currency: expenses.thisMonth[i].currency,
+                    lastMonthDiff:
+                        expenses.thisMonth[i].amount - lastMonthExpenses,
+                  ));
+                }
+
                 return SliverToBoxAdapter(
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
-                      children: resp.map((balance) {
+                      children: balances.map((balance) {
                         return Container(
                           padding: const EdgeInsets.all(16),
-                          width: resp.length > 1
+                          width: balances.length > 1
                               ? mq.size.width / 1.1
                               : mq.size.width,
                           child: TotalExpensesCard(balance),

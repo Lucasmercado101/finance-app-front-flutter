@@ -91,10 +91,11 @@ class TransactionItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                transaction.category,
-                style: Theme.of(context).textTheme.headline6,
-              ),
+              if (transaction.category != null)
+                Text(
+                  transaction.category!,
+                  style: Theme.of(context).textTheme.headline6,
+                ),
               const SizedBox(
                 height: 10,
               ),

@@ -43,7 +43,30 @@ class Wallet with ChangeNotifier {
   }
 
   getTransactions(Period range) async {
-    transactions = WalletApi.getTransactions(range: range);
+    DateTime startDate;
+    DateTime endDate;
+    switch (range) {
+      case Period.today:
+        startDate = DateTime.now().subtract(Duration(days: 1));
+        endDate = DateTime.now();
+        break;
+      case Period.week:
+        startDate = DateTime.now().subtract(Duration(days: 7));
+        endDate = DateTime.now();
+        break;
+      case Period.month:
+        startDate = DateTime.now().subtract(Duration(days: 30));
+        endDate = DateTime.now();
+        break;
+      case Period.year:
+        startDate = DateTime.now().subtract(Duration(days: 365));
+        endDate = DateTime.now();
+        break;
+      default:
+        throw Exception("Unknown range: $range");
+    }
+    transactions =
+        WalletApi.getTransactions(endDate: endDate, startDate: startDate);
     notifyListeners();
   }
 

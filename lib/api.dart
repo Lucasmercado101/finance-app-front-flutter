@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:finance_app_front_flutter/api/getExpensesBetween.dart';
+import 'package:finance_app_front_flutter/api/getIncomesBetween.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart';
 
@@ -34,7 +36,7 @@ class Transaction {
   final DateTime createdAt;
   final double amount;
   final String currency;
-  final String category;
+  final String? category;
   final String? comment;
   final TransactionType type;
 
@@ -42,10 +44,10 @@ class Transaction {
     required this.id,
     required this.createdAt,
     required this.amount,
-    required this.category,
-    required this.comment,
     required this.currency,
     required this.type,
+    this.category,
+    this.comment,
   });
 
   Transaction.fromJson(Map<String, dynamic> json)
@@ -95,133 +97,154 @@ class WalletApi {
   static final Uri totalMonthlyExpensesEndpoint =
       Uri.parse("$baseUrl/total-monthly-expenses");
 
-  static Uri expensesBetweenEndpoint({
-    DateTime? startDate,
-    DateTime? endDate,
-    Period? period,
-  }) {
-    assert(startDate != null || endDate != null || period != null);
-    assert(period == null || startDate == null && endDate == null);
-    var endpoint = Uri.parse("$baseUrl/expenses-between");
-    if (startDate != null && endDate != null) {
-      endpoint = endpoint.replace(queryParameters: {
-        "startDate": startDate.toIso8601String(),
-        "endDate": endDate.toIso8601String(),
-      });
-    } else if (period != null) {
-      endpoint = endpoint.replace(queryParameters: {
-        "period": period.toString().split('.')[1],
-      });
-    }
-    return endpoint;
-  }
+  // static Uri expensesBetweenEndpoint({
+  //   DateTime? startDate,
+  //   DateTime? endDate,
+  //   Period? period,
+  // }) {
+  //   assert(startDate != null || endDate != null || period != null);
+  //   assert(period == null || startDate == null && endDate == null);
+  //   var endpoint = Uri.parse("$baseUrl/expenses-between");
+  //   if (startDate != null && endDate != null) {
+  //     endpoint = endpoint.replace(queryParameters: {
+  //       "startDate": startDate.toIso8601String(),
+  //       "endDate": endDate.toIso8601String(),
+  //     });
+  //   } else if (period != null) {
+  //     endpoint = endpoint.replace(queryParameters: {
+  //       "period": period.toString().split('.')[1],
+  //     });
+  //   }
+  //   return endpoint;
+  // }
 
-  static Uri transactionsBetweenEndpoint({
-    DateTime? startDate,
-    DateTime? endDate,
-    Period? period,
-  }) {
-    assert(startDate != null || endDate != null || period != null);
-    assert(period == null || startDate == null && endDate == null);
-    var endpoint = Uri.parse("$baseUrl/transactions-between");
-    if (startDate != null && endDate != null) {
-      endpoint = endpoint.replace(queryParameters: {
-        "startDate": startDate.toIso8601String(),
-        "endDate": endDate.toIso8601String(),
-      });
-    } else if (period != null) {
-      endpoint = endpoint.replace(queryParameters: {
-        "period": period.toString().split('.')[1],
-      });
-    }
-    return endpoint;
-  }
+  // static Uri transactionsBetweenEndpoint({
+  //   DateTime? startDate,
+  //   DateTime? endDate,
+  //   Period? period,
+  // }) {
+  //   assert(startDate != null || endDate != null || period != null);
+  //   assert(period == null || startDate == null && endDate == null);
+  //   var endpoint = Uri.parse("$baseUrl/transactions-between");
+  //   if (startDate != null && endDate != null) {
+  //     endpoint = endpoint.replace(queryParameters: {
+  //       "startDate": startDate.toIso8601String(),
+  //       "endDate": endDate.toIso8601String(),
+  //     });
+  //   } else if (period != null) {
+  //     endpoint = endpoint.replace(queryParameters: {
+  //       "period": period.toString().split('.')[1],
+  //     });
+  //   }
+  //   return endpoint;
+  // }
 
-  // --------  API Calls  --------
+  // // --------  API Calls  --------
 
-  static Future<Response> newIncome({
-    required currency,
-    required amount,
-    required category,
-    createdAt,
-    comment,
-  }) async {
-    return post(
-      newIncomeEndpoint,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'currency': currency,
-        'createdAt': (createdAt ?? DateTime.now()).toIso8601String(),
-        'amount': amount,
-        'category': category,
-        'comment': comment,
-      }),
-    );
-  }
+  // static Future<Response> newIncome({
+  //   required currency,
+  //   required amount,
+  //   required category,
+  //   createdAt,
+  //   comment,
+  // }) async {
+  //   return post(
+  //     newIncomeEndpoint,
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: jsonEncode({
+  //       'currency': currency,
+  //       'createdAt': (createdAt ?? DateTime.now()).toIso8601String(),
+  //       'amount': amount,
+  //       'category': category,
+  //       'comment': comment,
+  //     }),
+  //   );
+  // }
 
-  static Future<Response> newExpense({
-    required currency,
-    required amount,
-    required category,
-    createdAt,
-    comment,
-  }) async {
-    return post(
-      newExpenseEndpoint,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'currency': currency,
-        'createdAt': (createdAt ?? DateTime.now()).toIso8601String(),
-        'amount': amount,
-        'category': category,
-        'comment': comment,
-      }),
-    );
-  }
+  // static Future<Response> newExpense({
+  //   required currency,
+  //   required amount,
+  //   required category,
+  //   createdAt,
+  //   comment,
+  // }) async {
+  //   return post(
+  //     newExpenseEndpoint,
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: jsonEncode({
+  //       'currency': currency,
+  //       'createdAt': (createdAt ?? DateTime.now()).toIso8601String(),
+  //       'amount': amount,
+  //       'category': category,
+  //       'comment': comment,
+  //     }),
+  //   );
+  // }
 
-  static Future<List<MonthlyBalance>> getTotalMonthlyExpenses() async {
-    final response = await get(totalMonthlyExpensesEndpoint);
-    final parsed = json.decode(response.body);
-    final parsedList = List<Map<String, dynamic>>.from(parsed);
+  // static Future<List<MonthlyBalance>> getTotalMonthlyExpenses() async {
+  //   final response = await get(totalMonthlyExpensesEndpoint);
+  //   final parsed = json.decode(response.body);
+  //   final parsedList = List<Map<String, dynamic>>.from(parsed);
 
-    return parsedList.map((el) => MonthlyBalance.fromJson(el)).toList();
-  }
+  //   return parsedList.map((el) => MonthlyBalance.fromJson(el)).toList();
+  // }
 
-  static Future<List<Expense>> getExpenses({
-    Period? range,
-    DateTime? startDate,
-    DateTime? endDate,
-  }) {
-    return get(expensesBetweenEndpoint(
-      startDate: startDate,
-      endDate: endDate,
-      period: range,
-    )).then((response) {
-      final parsed = json.decode(response.body);
-      final parsedList = List<Map<String, dynamic>>.from(parsed);
+  // static Future<List<Expense>> getExpenses({
+  //   Period? range,
+  //   DateTime? startDate,
+  //   DateTime? endDate,
+  // }) {
+  //   return get(expensesBetweenEndpoint(
+  //     startDate: startDate,
+  //     endDate: endDate,
+  //     period: range,
+  //   )).then((response) {
+  //     final parsed = json.decode(response.body);
+  //     final parsedList = List<Map<String, dynamic>>.from(parsed);
 
-      return parsedList.map((el) => Expense.fromJson(el)).toList();
-    });
-  }
+  //     return parsedList.map((el) => Expense.fromJson(el)).toList();
+  //   });
+  // }
 
   static Future<List<Transaction>> getTransactions({
     Period? range,
-    DateTime? startDate,
-    DateTime? endDate,
-  }) {
-    return get(transactionsBetweenEndpoint(
-      startDate: startDate,
-      endDate: endDate,
-      period: range,
-    )).then((response) {
-      final parsed = json.decode(response.body);
-      final parsedList = List<Map<String, dynamic>>.from(parsed);
-
-      return parsedList.map((el) => Transaction.fromJson(el)).toList();
-    });
+    required DateTime startDate,
+    required DateTime endDate,
+  }) async {
+    try {
+      final expenses = await getExpensesBetween(from: startDate, to: endDate);
+      final incomes = await getIncomesBetween(from: startDate, to: endDate);
+      final transactions = expenses
+          .map((e) => Transaction(
+                id: e.id,
+                createdAt: e.createdAt,
+                amount: e.amount,
+                category: e.category,
+                comment: e.comment,
+                currency: e.currency,
+                type: TransactionType.expense,
+              ))
+          .toList();
+      transactions.addAll(
+        incomes
+            .map((i) => Transaction(
+                  id: i.id,
+                  createdAt: i.createdAt,
+                  amount: i.amount,
+                  category: i.category,
+                  comment: i.comment,
+                  currency: i.currency,
+                  type: TransactionType.income,
+                ))
+            .toList(),
+      );
+      return transactions;
+    } catch (e) {
+      return Future.error(e);
+    }
   }
 }

@@ -4,7 +4,7 @@ import 'package:finance_app_front_flutter/api/index.dart';
 import 'package:finance_app_front_flutter/api/responseExpenseDto.dart';
 import 'package:http/http.dart';
 
-Future getExpensesBetween({
+Future<List<ResponseExpenseDto>> getExpensesBetween({
   required DateTime from,
   required DateTime to,
 }) {

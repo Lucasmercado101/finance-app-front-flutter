@@ -17,6 +17,7 @@ Future<List<ResponseIncomeDto>> getIncomesBetween({
     ),
   ).then((val) {
     final parsedJson = jsonDecode(val.body);
-    return parsedJson.map((el) => ResponseIncomeDto.fromJson(el)).toList();
+    final data = List<Map<String, dynamic>>.from(parsedJson);
+    return data.map((el) => ResponseIncomeDto.fromJson(el)).toList();
   });
 }

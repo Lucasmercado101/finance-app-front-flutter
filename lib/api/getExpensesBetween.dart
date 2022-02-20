@@ -17,6 +17,7 @@ Future<List<ResponseExpenseDto>> getExpensesBetween({
     ),
   ).then((val) {
     final parsedJson = jsonDecode(val.body);
-    return parsedJson.map((el) => ResponseExpenseDto.fromJson(el)).toList();
+    final data = List<Map<String, dynamic>>.from(parsedJson);
+    return data.map((el) => ResponseExpenseDto.fromJson(el)).toList();
   });
 }
